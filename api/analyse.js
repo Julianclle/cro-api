@@ -53,12 +53,12 @@ export default async function handler(req, res) {
 # CONTENU RÉEL DE LA HOMEPAGE
 Voici le contenu HTML/texte extrait de la homepage de ${finalUrl}. Utilise-le pour faire une analyse précise et spécifique :
 <homepage_content>
-${homeContent.slice(0, 6000)}
+${homeContent.slice(0, 2000)}
 </homepage_content>
 ${productContent ? `
 # CONTENU RÉEL D'UNE FICHE PRODUIT
 <product_content>
-${productContent.slice(0, 3000)}
+${productContent.slice(0, 1000)}
 </product_content>` : ''}
 ` : '';
 
