@@ -183,7 +183,7 @@ Réponds UNIQUEMENT en JSON valide, sans balises markdown, sans texte autour.
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
-        max_tokens: 4000,
+        max_tokens: 8000,
         messages: [{ role: 'user', content: prompt }],
       }),
     });
