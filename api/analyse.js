@@ -13,7 +13,20 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { url, niche, visiteurs, cvr_actuel, panier_moyen, cvr_cible } = req.body;
+    // Support les deux formats : { url } et { urlHome, homeContent, productContent }
+    const {
+      url,
+      urlHome,
+      homeContent,
+      productContent,
+      niche,
+      visiteurs,
+      cvr_actuel,
+      panier_moyen,
+      cvr_cible
+    } = req.body;
+
+    const finalUrl = url || urlHome || 'URL non fournie';
 
     const ca_actuel = visiteurs && cvr_actuel && panier_moyen
       ? Math.round(visiteurs * (cvr_actuel / 100) * panier_moyen)
@@ -35,6 +48,20 @@ export default async function handler(req, res) {
 - Gain mensuel potentiel : ${gain_mensuel.toLocaleString('fr-FR')}€
 ` : `Aucune métrique business fournie. Baser l'analyse uniquement sur les éléments UX/CRO observables.`;
 
+    // Contenu réel de la page si disponible
+    const pageContext = homeContent ? `
+# CONTENU RÉEL DE LA HOMEPAGE
+Voici le contenu HTML/texte extrait de la homepage de ${finalUrl}. Utilise-le pour faire une analyse précise et spécifique :
+<homepage_content>
+${homeContent.slice(0, 6000)}
+</homepage_content>
+${productContent ? `
+# CONTENU RÉEL D'UNE FICHE PRODUIT
+<product_content>
+${productContent.slice(0, 3000)}
+</product_content>` : ''}
+` : '';
+
     const prompt = `Tu es Julian Caillé, consultant senior UX/UI & CRO spécialisé en e-commerce depuis plus de 5 ans.
 
 Tu réalises des audits CRO premium comparables à ceux produits par des agences CRO haut de gamme.
@@ -52,7 +79,7 @@ Tu combines :
 - stratégie de revenus.
 
 Ton rôle :
-Analyser une boutique e-commerce à partir de son URL et produire un audit CRO extrêmement pertinent, crédible et actionnable.
+Analyser une boutique e-commerce à partir de son URL et de son contenu réel, puis produire un audit CRO extrêmement pertinent, crédible et actionnable.
 
 Tu ne fais JAMAIS de recommandations génériques.
 Tu évites absolument :
@@ -62,7 +89,7 @@ Tu évites absolument :
 - "rassurer le client"
 
 Chaque insight doit être :
-- spécifique,
+- spécifique au contenu réel de la page,
 - concret,
 - relié à un problème observable,
 - relié à un mécanisme psychologique,
@@ -74,32 +101,35 @@ LANGUE : Tu réponds UNIQUEMENT en français.
 
 # CONTEXTE
 
-URL : ${url}
+URL : ${finalUrl}
 Niche : ${niche}
 
 # DONNÉES BUSINESS
 
 ${metriques_block}
 
+${pageContext}
+
 # MÉTHODOLOGIE
 
 Avant de répondre :
-1. Analyse mentalement le comportement d'un visiteur froid sur ${url}.
-2. Identifie les moments de confusion.
-3. Détecte les frictions cognitives.
-4. Analyse la vitesse de compréhension de l'offre.
-5. Analyse la hiérarchie visuelle.
-6. Analyse la qualité de persuasion.
-7. Analyse les signaux de confiance.
+1. Analyse le contenu réel fourni ci-dessus pour identifier les vrais problèmes.
+2. Identifie les moments de confusion dans le parcours réel.
+3. Détecte les frictions cognitives observables dans le contenu.
+4. Analyse la vitesse de compréhension de l'offre telle qu'elle est rédigée.
+5. Analyse la hiérarchie visuelle décrite dans le HTML.
+6. Analyse la qualité de persuasion du copywriting existant.
+7. Analyse les signaux de confiance présents ou absents.
 8. Analyse les points de fuite potentiels.
 9. Priorise les problèmes selon leur impact probable sur une boutique de niche ${niche}.
-10. Déduis les optimisations à plus fort ROI.
+10. Déduis les optimisations à plus fort ROI basées sur le contenu réel.
 
 # RÈGLES IMPORTANTES
 
+- Baser chaque recommandation sur le contenu réel analysé.
 - Ne jamais inventer de données business.
 - Ne jamais donner de conseils vagues.
-- Toujours être spécifique à la boutique ${url} dans la niche ${niche}.
+- Toujours être spécifique à la boutique ${finalUrl} dans la niche ${niche}.
 - Chaque champ "analyse" doit contenir minimum 3 phrases détaillées.
 - Chaque "problemes" doit contenir minimum 2 problèmes concrets.
 - Chaque "recommandations" doit contenir minimum 2 recommandations actionnables.
