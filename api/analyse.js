@@ -14,16 +14,26 @@ export default async function handler(req, res) {
       ? `\nCONTENU HOMEPAGE (extrait):\n${homeContent.slice(0, 1500)}`
       : '';
 
+    const recoTemplate = Array.from({length: 13}, (_, i) => {
+      const impacts = ['eleve','eleve','eleve','moyen','moyen','moyen','moyen','eleve','moyen','eleve','moyen','eleve','moyen'];
+      const efforts = ['faible','moyen','faible','faible','moyen','eleve','faible','moyen','faible','moyen','eleve','faible','moyen'];
+      return `{"titre":"","solution":"","impact":"${impacts[i]}","effort":"${efforts[i]}","section":""}`;
+    }).join(',');
+
     const prompt = `Tu es un consultant CRO senior e-commerce. Analyse cette boutique et retourne UNIQUEMENT un JSON valide (pas de markdown, pas de texte autour).
 
 URL: ${finalUrl}
 Niche: ${niche}
 ${pageCtx}
 
-JSON à retourner (complète chaque champ, scores sur 100):
-{"resume_executif":{"score_global":0,"synthese":"","plus_grande_opportunite":""},"scoring":{"clarte_offre":0,"copywriting":0,"mobile_ux":0,"confiance":0,"persuasion":0},"diagnostic":{"forces":["",""],"faiblesses":["",""]},"recommandations":[{"titre":"","probleme":"","solution":"","impact":"eleve","effort":"faible","section":""},{"titre":"","probleme":"","solution":"","impact":"eleve","effort":"moyen","section":""},{"titre":"","probleme":"","solution":"","impact":"moyen","effort":"faible","section":""},{"titre":"","probleme":"","solution":"","impact":"moyen","effort":"moyen","section":""},{"titre":"","probleme":"","solution":"","impact":"moyen","effort":"eleve","section":""},{"titre":"","probleme":"","solution":"","impact":"eleve","effort":"moyen","section":""},{"titre":"","probleme":"","solution":"","impact":"eleve","effort":"faible","section":""},{"titre":"","probleme":"","solution":"","impact":"moyen","effort":"faible","section":""}],"quick_wins":[{"action":"","impact":""},{"action":"","impact":""},{"action":"","impact":""}]}
+JSON à retourner (complète TOUS les champs, scores sur 100, EXACTEMENT 13 recommandations):
+{"resume_executif":{"score_global":0,"synthese":"","plus_grande_opportunite":""},"scoring":{"clarte_offre":0,"copywriting":0,"mobile_ux":0,"confiance":0,"persuasion":0},"recommandations":[${recoTemplate}]}
 
-Règles: sois spécifique à ${finalUrl}, recommandations concrètes et actionnables, analyse réelle basée sur la niche ${niche}. UNIQUEMENT le JSON, rien d'autre.`;
+Règles strictes:
+- Sois spécifique à ${finalUrl} et la niche ${niche}
+- Chaque recommandation doit avoir un titre court et percutant + une solution concrète différente
+- Couvre ces axes : proposition de valeur, above the fold, copywriting, mobile UX, fiche produit, checkout, confiance, urgence, social proof, navigation, SEO on-page, email capture, upsell
+- UNIQUEMENT le JSON, rien d'autre`;
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
