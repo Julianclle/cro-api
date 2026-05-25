@@ -14,9 +14,10 @@ export default async function handler(req, res) {
       ? `\nCONTENU HOMEPAGE (extrait):\n${homeContent.slice(0, 1500)}`
       : '';
 
-    const recoTemplate = Array.from({length: 13}, (_, i) => {
-      const impacts = ['eleve','eleve','eleve','moyen','moyen','moyen','moyen','eleve','moyen','eleve','moyen','eleve','moyen'];
-      const efforts = ['faible','moyen','faible','faible','moyen','eleve','faible','moyen','faible','moyen','eleve','faible','moyen'];
+    const NB_RECOS = 20;
+    const impacts = ['eleve','eleve','eleve','moyen','moyen','eleve','moyen','eleve','moyen','eleve','moyen','eleve','moyen','eleve','moyen','eleve','moyen','eleve','moyen','eleve'];
+    const efforts = ['faible','moyen','faible','faible','moyen','eleve','faible','moyen','faible','moyen','eleve','faible','moyen','faible','moyen','eleve','faible','moyen','faible','moyen'];
+    const recoTemplate = Array.from({length: NB_RECOS}, (_, i) => {
       return `{"titre":"","solution":"","impact":"${impacts[i]}","effort":"${efforts[i]}","section":""}`;
     }).join(',');
 
@@ -26,13 +27,14 @@ URL: ${finalUrl}
 Niche: ${niche}
 ${pageCtx}
 
-JSON à retourner (complète TOUS les champs, scores sur 100, EXACTEMENT 13 recommandations):
+JSON à retourner (complète TOUS les champs, scores sur 100, EXACTEMENT ${NB_RECOS} recommandations):
 {"resume_executif":{"score_global":0,"synthese":"","plus_grande_opportunite":""},"scoring":{"clarte_offre":0,"copywriting":0,"mobile_ux":0,"confiance":0,"persuasion":0},"recommandations":[${recoTemplate}]}
 
 Règles strictes:
-- Sois spécifique à ${finalUrl} et la niche ${niche}
-- Chaque recommandation doit avoir un titre court et percutant + une solution concrète différente
-- Couvre ces axes : proposition de valeur, above the fold, copywriting, mobile UX, fiche produit, checkout, confiance, urgence, social proof, navigation, SEO on-page, email capture, upsell
+- Sois TRÈS spécifique à ${finalUrl} et la niche ${niche}
+- Chaque recommandation doit avoir un titre court et percutant + une solution concrète et actionnable
+- Couvre TOUS ces axes (au moins 1 reco par axe) : proposition de valeur, above the fold, copywriting, mobile UX, fiche produit, checkout, confiance, urgence, social proof, navigation, SEO on-page, email capture, upsell, livraison, retours, FAQ, réassurance, A/B tests prioritaires, performance technique
+- Les solutions doivent être précises avec des exemples de textes, chiffres, ou éléments concrets
 - UNIQUEMENT le JSON, rien d'autre`;
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
